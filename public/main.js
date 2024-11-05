@@ -513,97 +513,103 @@ function getMessagestring(message, { emotes }) {
     console.log(`Conectado a ${addr}:${port}`);
 });
 
-  await client.connect()
-      .then(() => {
-          const hashVal = window.location.hash.slice(1);
-          if (hashVal.length) {
-              // Cambia de canal solo si ya estás conectado
-              changeChannel(hashVal, "#", client);
-          }
-      })
-  .catch(e => console.error('No se pudo conectar a Twitch:', e));
-    
-    eventsarray.forEach(event => {
-        client.on(event, (...args) => {
-            // Guardar el último evento en el localStorage
-            const lastevent = "lastevent" + event;
-            localStorage.setItem(lastevent, JSON.stringify(args));
-            localStorage.setItem("lastevent", event);
-            const mapdata = mapEvent(event, args);
-            
-            // Mapear todos los datos de args en un solo objeto con sus claves originales
-            // const argsObject = args.reduce((acc, arg) => {
-            //     if (typeof arg === 'object' && arg !== null) {
-            //         // Si es un objeto, agregamos cada propiedad con su clave original
-            //         Object.entries(arg).forEach(([key, value]) => {
-            //             if (acc[key] !== undefined) {
-            //                 // Si la clave ya existe, conviértelo en un array o añade el nuevo valor
-            //                 acc[key] = Array.isArray(acc[key]) ? [...acc[key], value] : [acc[key], value];
-            //             } else {
-            //                 // Si la clave no existe, simplemente la añadimos
-            //                 acc[key] = value;
-            //             }
-            //         });
-            //     } else {
-            //         // Si es un valor primitivo, lo agregamos sin reemplazar el valor anterior
-            //         if (acc[event] !== undefined) {
-            //             acc[event] = Array.isArray(acc[event]) ? [...acc[event], arg] : [acc[event], arg];
-            //         } else {
-            //             acc[event] = arg;
-            //         }
-            //     }
-            //     return acc;
-            // }, {});
-            
-            // console.log("argsObject:", argsObject);
-            switch (event) {
-                case "chat":
-                    handlechat(mapdata);
-                    break;
-                default:
-                  console.log(event,mapEvent(event, args));
-                }
-    
-            });
-    });
-    function baseData(data, commentIndex = null, eventData) {
-      let rawcomment = commentIndex !== null ? eventData[commentIndex] : undefined || data["system-msg"];
-      return {
-          uniqueId: data.username || eventData[1],
-          nickname: data["display-name"] || eventData[1],
-          isMod: data.mod,
-          isSub: data.subscriber,
-          isVip: data.vip,
-          comment: getMessagestring(rawcomment, data).message,
-          emotes: getMessagestring(rawcomment, data).emotes,
-          data
-      };
+await client.connect()
+    .then(() => {
+        const hashVal = window.location.hash.slice(1);
+        if (hashVal.length) {
+            // Cambia de canal solo si ya estás conectado
+            changeChannel(hashVal, "#", client);
+        }
+    })
+.catch(e => console.error('No se pudo conectar a Twitch:', e));
+  
+eventsarray.forEach(event => {
+    client.on(event, (...args) => {
+        // Guardar el último evento en el localStorage
+        const lastevent = "lastevent" + event;
+        localStorage.setItem(lastevent, JSON.stringify(args));
+        localStorage.setItem("lastevent", event);
+        const mapdata = mapEvent(event, args);
+        
+        // Mapear todos los datos de args en un solo objeto con sus claves originales
+        // const argsObject = args.reduce((acc, arg) => {
+        //     if (typeof arg === 'object' && arg !== null) {
+        //         // Si es un objeto, agregamos cada propiedad con su clave original
+        //         Object.entries(arg).forEach(([key, value]) => {
+        //             if (acc[key] !== undefined) {
+        //                 // Si la clave ya existe, conviértelo en un array o añade el nuevo valor
+        //                 acc[key] = Array.isArray(acc[key]) ? [...acc[key], value] : [acc[key], value];
+        //             } else {
+        //                 // Si la clave no existe, simplemente la añadimos
+        //                 acc[key] = value;
+        //             }
+        //         });
+        //     } else {
+        //         // Si es un valor primitivo, lo agregamos sin reemplazar el valor anterior
+        //         if (acc[event] !== undefined) {
+        //             acc[event] = Array.isArray(acc[event]) ? [...acc[event], arg] : [acc[event], arg];
+        //         } else {
+        //             acc[event] = arg;
+        //         }
+        //     }
+        //     return acc;
+        // }, {});
+        
+        // console.log("argsObject:", argsObject);
+        switch (event) {
+            case "chat":
+                handlechat(mapdata);
+                Readtext(event,mapdata);
+                HandleAccionEvent("chat",mapdata);
+                break;
+            case "cheer":
+                handlegift(mapdata);
+                Readtext("gift",mapdata);
+                HandleAccionEvent("bits",mapdata);
+                break;
+            default:
+              console.log(event,mapEvent(event, args));
+            }
+
+        });
+});
+function baseData(data, commentIndex = null, eventData) {
+  let rawcomment = commentIndex !== null ? eventData[commentIndex] : undefined || data["system-msg"];
+  return {
+      uniqueId: data.username || eventData[1],
+      nickname: data["display-name"] || eventData[1],
+      isMod: data.mod,
+      isSub: data.subscriber,
+      isVip: data.vip,
+      comment: getMessagestring(rawcomment, data).message,
+      emotes: getMessagestring(rawcomment, data).emotes,
+      data
+  };
+}
+function mapEvent(eventType, eventData) {
+
+    switch (eventType) {
+        case "chat":
+            return baseData(eventData[1], 2, eventData);
+        case "cheer":
+            return { ...baseData(eventData[1], 2, eventData), bits: eventData[1].bits };
+        case "join":
+            return { uniqueId: eventData[1], nickname: eventData[1], isMod: !eventData[2], isSub: !eventData[2] };
+        case "sub":
+            return baseData(eventData[4],null, eventData);
+        case "resub":
+            return { ...baseData(eventData[5], null , eventData), nickname: eventData[3], uniqueId: eventData[3] };
+        case "subgift":
+            return { ...baseData(eventData[5], null , eventData), nickname: eventData[3], uniqueId: eventData[3] };
+        case "submysterygift":
+            return baseData(eventData[4],null, eventData);
+        case "primepaidupgrade":
+            return baseData(eventData[3], null, eventData);
+        case "giftpaidupgrade":
+            return baseData(eventData[4], null, eventData);
+        case "raided":
+            return { ...baseData(eventData[3], null, eventData), nickname: eventData[1], uniqueId: eventData[1] };
+        default:
+            return eventData;
     }
-    function mapEvent(eventType, eventData) {
-  
-      switch (eventType) {
-          case "chat":
-              return baseData(eventData[1], 2, eventData);
-          case "cheer":
-              return { ...baseData(eventData[1], 2, eventData), bits: eventData[1].bits };
-          case "join":
-              return { uniqueId: eventData[1], nickname: eventData[1], isMod: !eventData[2], isSub: !eventData[2] };
-          case "sub":
-              return baseData(eventData[4],null, eventData);
-          case "resub":
-              return { ...baseData(eventData[5], null , eventData), nickname: eventData[3], uniqueId: eventData[3] };
-          case "subgift":
-              return { ...baseData(eventData[5], null , eventData), nickname: eventData[3], uniqueId: eventData[3] };
-          case "submysterygift":
-              return baseData(eventData[4],null, eventData);
-          case "primepaidupgrade":
-              return baseData(eventData[3], null, eventData);
-          case "giftpaidupgrade":
-              return baseData(eventData[4], null, eventData);
-          case "raided":
-              return { ...baseData(eventData[3], null, eventData), nickname: eventData[1], uniqueId: eventData[1] };
-          default:
-              return eventData;
-      }
-  }
-  
+}

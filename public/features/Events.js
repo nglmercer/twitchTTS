@@ -41,7 +41,7 @@ async function getEventconfig() {
       toggleoptions: true,
       returnType: 'string',
       options: [{ value: 'chat', label: 'Chat' }, { value: 'follow', label: 'Seguimiento' },{ value: 'like', label: 'like'},
-      {value: 'share', label: 'compartir'}, { value: 'subscribe', label: 'suscripcion' }, { value: 'gift', label: 'Gift' }],
+      {value: 'share', label: 'compartir'}, { value: 'subscribe', label: 'suscripcion' }, { value: 'gift', label: 'specific Gift' },{ value: 'bits', label: 'twitch bits' }],
     },
     chat: {
       label: '',
@@ -64,6 +64,13 @@ async function getEventconfig() {
       returnType: 'number',
       options: mapselectgift,
       dataAssociated: 'gift',
+    },
+    bits: {
+      label: '',
+      class: 'input-default',
+      type: 'number',
+      returnType: 'number',
+      dataAssociated: 'bits',
     },
     Actions: {
       class: 'input-default',
@@ -126,6 +133,7 @@ const testdata = {
   chat: "default text",
   like: 10,
   gift: 5655,
+  bits: 100,
   Actions: [],
   id: undefined,
 }
@@ -164,7 +172,7 @@ const configtable = {
       toggleoptions: true,
       returnType: 'string',
       options: [{ value: 'chat', label: 'Chat' }, { value: 'follow', label: 'Seguimiento' },{ value: 'like', label: 'like'},
-      {value: 'share', label: 'compartir'}, { value: 'subscribe', label: 'suscripcion' }, { value: 'gift', label: 'Gift' }],
+      {value: 'share', label: 'compartir'}, { value: 'subscribe', label: 'suscripcion' }, { value: 'gift', label: 'Gift' },{ value: 'bits', label: 'twitch bits' }],
     }
 }
 const tableconfigcallback = {
