@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitch SpeechCHAT Voz</title>
     <meta name="description" content="twitch tts.">
-    <script src="app.js"></script>
     <script src="tmi.min.js"></script>
     <script src="TTSmain.js"></script>
 
@@ -50,22 +49,6 @@
 <audio id="soundPlayer" type="audio/mp3"></audio>
 <input id="skip-button" type="button" value="SKIP"> </button>
   <div id="chatbox"></div>
-<script>
-  const filterWordsInput = document.getElementById('filter-words');
-
-  // Load the last entered value from localStorage
-  const lastFilterWords = localStorage.getItem('lastFilterWords');
-  if (lastFilterWords) {
-      filterWordsInput.value = lastFilterWords;
-  }
-
-  filterWordsInput.addEventListener('change', () => {
-      const currentFilterWords = filterWordsInput.value;
-      if (currentFilterWords) {
-          // Store the current value in localStorage
-          localStorage.setItem('lastFilterWords', currentFilterWords);
-      }
-  });
-</script>
+<
 </body>
 </html>
