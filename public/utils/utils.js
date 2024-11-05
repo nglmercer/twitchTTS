@@ -285,7 +285,8 @@ const replaceVariables = (command, data, iscommand = false ) => {
     .replace(/repeatCount/g, data.repeatCount || '123')
     .replace(/repeatcount/g, data.repeatCount || '123')
     .replace(/playername/g, playerName || '@a') // Reemplazar el nombre del jugador
-    .replace(/diamonds/g, data.diamondCount || '50testDiamonds')
+    .replace(/diamonds/g, data.diamondCount || data.bits || '50testDiamonds')
+    .replace(/bits/g, data.bits || data.diamondCount || '50testBits')
     .replace(/likecount/g, data.likeCount || '50testLikes')
     .replace(/followRole/g, data.followRole || 'followRole 0')
     .replace(/userId/g, data.userId || '1235646')

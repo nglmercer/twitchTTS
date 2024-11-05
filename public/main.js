@@ -28,7 +28,13 @@ if (userProfile.state.connected) {
     }
   });
   
-    userProfile.setConnectionStatus('away');
+  userProfile.setConnectionStatus('away');
+  await client.connect()
+    .then(() => {
+        const hashVal = window.location.hash.slice(1);
+        if (hashVal.length) {changeChannel(hashVal, "#", client);}
+    })
+    .catch(e => console.error('No se pudo conectar a Twitch:', e));
 }
 // Escuchar eventos
 userProfile.addEventListener('userConnected', (e) => {
@@ -513,15 +519,7 @@ function getMessagestring(message, { emotes }) {
     console.log(`Conectado a ${addr}:${port}`);
 });
 
-await client.connect()
-    .then(() => {
-        const hashVal = window.location.hash.slice(1);
-        if (hashVal.length) {
-            // Cambia de canal solo si ya estás conectado
-            changeChannel(hashVal, "#", client);
-        }
-    })
-.catch(e => console.error('No se pudo conectar a Twitch:', e));
+
   
 eventsarray.forEach(event => {
     client.on(event, (...args) => {
